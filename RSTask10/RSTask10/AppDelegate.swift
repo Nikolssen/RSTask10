@@ -16,6 +16,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         let window = UIWindow(frame: UIScreen.main.bounds)
         self.window = window
+        setupAppearence()
         let navigationController = UINavigationController(rootViewController: DashboardViewController())
         window.rootViewController = navigationController
         window.makeKeyAndVisible()
@@ -23,4 +24,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     }
     
 
+    func setupAppearence(){
+        let navigationBarAppearence = UINavigationBar.appearance()
+        navigationBarAppearence.largeTitleTextAttributes = [.font : UIFont(name: "Nunito-ExtraBold", size: 36)!, .foregroundColor: UIColor.white]
+    }
+    
 }
