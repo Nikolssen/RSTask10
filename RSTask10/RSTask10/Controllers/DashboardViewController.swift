@@ -21,9 +21,8 @@ final class DashboardViewController: UIViewController {
     
     func configureUI() {
         
-        
         if #available(iOS 13, *){
-            tableView = UITableView(frame: .zero, style: .insetGrouped)
+            tableView = UITableView(frame: .zero, style: .grouped)
         } else {
             tableView = UITableView(frame: .zero, style: .grouped)
             tableView.layer.cornerRadius = 15
@@ -34,7 +33,9 @@ final class DashboardViewController: UIViewController {
         view.addSubview(startButton)
         view.addSubview(tableView)
         
+        tableView.backgroundColor = .init(named: "AppBackground")
         view.backgroundColor = .init(named: "AppBackground")
+        navigationController?.navigationBar.prefersLargeTitles = true
         navigationItem.largeTitleDisplayMode = .always
         navigationItem.title = "Game Counter"
         

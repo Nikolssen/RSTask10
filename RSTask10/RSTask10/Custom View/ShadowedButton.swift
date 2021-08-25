@@ -26,6 +26,8 @@ class ShadowedButton: UIButton {
     }
     
     func configureUI(){
+        layer.masksToBounds = false
+        titleLabel?.layer.masksToBounds = false
         
         backgroundColor = .init(named: "AppJade")
         
@@ -33,11 +35,15 @@ class ShadowedButton: UIButton {
         setTitleColor(.white, for: .highlighted)
         
         titleLabel?.font = UIFont(name: "Nunito-ExtraBold", size: 24)
-        titleLabel?.shadowOffset = CGSize(width: 0, height: 2)
-        titleLabel?.shadowColor = .black
+        titleLabel?.layer.shadowOffset = CGSize(width: 0, height: 2)
+        titleLabel?.layer.shadowColor = UIColor(red: 0.33, green: 0.47, blue: 0.68, alpha: 1.0).cgColor
+        titleLabel?.layer.shadowOpacity = 0.5
+        titleLabel?.layer.shadowRadius = 0
         
+        layer.shadowRadius = 0
+        layer.shadowOpacity = 0.5
         layer.shadowColor = UIColor(red: 0.33, green: 0.47, blue: 0.68, alpha: 1.0).cgColor
-        layer.shadowOffset = CGSize(width: 0, height: -5.0)
+        layer.shadowOffset = CGSize(width: 0, height: 5.0)
         
     }
     
