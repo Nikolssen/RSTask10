@@ -19,6 +19,7 @@
 		3F2A1A5126D67675004923BA /* ResultViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F2A1A5026D67675004923BA /* ResultViewController.swift */; };
 		3F2A1A5326D6768C004923BA /* GameViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F2A1A5226D6768C004923BA /* GameViewController.swift */; };
 		3F2A1A5526D677FD004923BA /* ShadowedButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F2A1A5426D677FD004923BA /* ShadowedButton.swift */; };
+		3F2A1A5726D68DFB004923BA /* PlayerTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F2A1A5626D68DFB004923BA /* PlayerTextField.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -36,6 +37,7 @@
 		3F2A1A5026D67675004923BA /* ResultViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResultViewController.swift; sourceTree = "<group>"; };
 		3F2A1A5226D6768C004923BA /* GameViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameViewController.swift; sourceTree = "<group>"; };
 		3F2A1A5426D677FD004923BA /* ShadowedButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShadowedButton.swift; sourceTree = "<group>"; };
+		3F2A1A5626D68DFB004923BA /* PlayerTextField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayerTextField.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -113,6 +115,7 @@
 			isa = PBXGroup;
 			children = (
 				3F2A1A5426D677FD004923BA /* ShadowedButton.swift */,
+				3F2A1A5626D68DFB004923BA /* PlayerTextField.swift */,
 			);
 			path = "Custom View";
 			sourceTree = "<group>";
@@ -195,6 +198,7 @@
 				3F2A1A4F26D67665004923BA /* RollViewController.swift in Sources */,
 				3F2A1A4C26D67630004923BA /* NewPlayerViewController.swift in Sources */,
 				3F2A1A2A26D624AE004923BA /* AppDelegate.swift in Sources */,
+				3F2A1A5726D68DFB004923BA /* PlayerTextField.swift in Sources */,
 				3F2A1A5126D67675004923BA /* ResultViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
