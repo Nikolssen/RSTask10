@@ -14,7 +14,7 @@ final class NewPlayerViewController: UIViewController {
         super.viewDidLoad()
         configureUI()
         configureLayout()
-        // Do any additional setup after loading the view.
+        textField.addTarget(self, action: #selector(shouldEnableButton), for: .editingChanged)
     }
 
     func configureUI() {
@@ -23,10 +23,16 @@ final class NewPlayerViewController: UIViewController {
         navigationItem.largeTitleDisplayMode = .always
         navigationItem.title = "Add Player"
         
-        view.backgroundColor = .init(named: "AppBackground")
+        navigationItem.backButtonTitle = "Back"
+        
+        navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Add", style: .plain, target: self, action:  #selector(addUser))
+        navigationItem.rightBarButtonItem?.isEnabled = false
+        
+        
         
         view.addSubview(textField)
         
+        view.backgroundColor = .init(named: "AppBackground")
         
         textField.tintColor = .white
         textField.font = UIFont(name: "Nunito-ExtraBold", size: 20)
@@ -44,5 +50,18 @@ final class NewPlayerViewController: UIViewController {
             textField.centerXAnchor.constraint(equalTo: view.safeAreaLayoutGuide.centerXAnchor),
             textField.heightAnchor.constraint(equalToConstant: 60)
         ])
+    }
+    
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        textField.becomeFirstResponder()
+    }
+    
+    @objc func addUser(){
+        
+    }
+    
+    @objc func shouldEnableButton(){
+        navigationItem.rightBarButtonItem?.isEnabled = !(textField.text?.isEmpty ?? true)
     }
 }
