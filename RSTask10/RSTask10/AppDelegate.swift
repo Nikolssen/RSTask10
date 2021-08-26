@@ -17,7 +17,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         let window = UIWindow(frame: UIScreen.main.bounds)
         self.window = window
         setupAppearence()
-        let navigationController = UINavigationController(rootViewController: DashboardViewController())
+        let navigationController = UINavigationController()
+        navigationController.viewControllers = [DashboardViewController(), NewPlayerViewController()]
         window.rootViewController = navigationController
         window.makeKeyAndVisible()
         return true
@@ -27,6 +28,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     func setupAppearence(){
         let navigationBarAppearence = UINavigationBar.appearance()
         navigationBarAppearence.largeTitleTextAttributes = [.font : UIFont(name: "Nunito-ExtraBold", size: 36)!, .foregroundColor: UIColor.white]
+        
+        let barButtonItemAppearence = UIBarButtonItem.appearance()
+        barButtonItemAppearence.setTitleTextAttributes([.font: UIFont(name: "Nunito-ExtraBold", size: 17)!, .foregroundColor: UIColor(named: "AppJade")!], for: .normal)
+        barButtonItemAppearence.setTitleTextAttributes([.font: UIFont(name: "Nunito-ExtraBold", size: 17)!, .foregroundColor: UIColor.white], for: .highlighted)
+        barButtonItemAppearence.setTitleTextAttributes([.font: UIFont(name: "Nunito-ExtraBold", size: 17)!], for: .disabled)
     }
     
 }
