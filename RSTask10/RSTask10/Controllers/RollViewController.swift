@@ -10,23 +10,25 @@ import AudioToolbox
 
 final class RollViewController: UIViewController {
 
+    
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        view.backgroundColor = .clear
+        view.backgroundColor = nil
         view.addGestureRecognizer(UIPanGestureRecognizer(target: self, action: #selector(dismissView)))
         
         let blurEffect = UIBlurEffect(style: .regular)
         let visualEffectView = UIVisualEffectView(effect: blurEffect)
         
         let imageView = UIImageView()
+        imageView.image = UIImage(named: "Four")
         
-        
-        view.addSubview(imageView)
+        visualEffectView.contentView.addSubview(imageView)
         view.addSubview(visualEffectView)
+
         
         visualEffectView.translatesAutoresizingMaskIntoConstraints = false
-        
+        imageView.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
             visualEffectView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             visualEffectView.topAnchor.constraint(equalTo: view.topAnchor),
@@ -45,6 +47,8 @@ final class RollViewController: UIViewController {
     }
 
     @objc func dismissView(){
-        self.dismiss(animated: true, completion: nil)
+        willMove(toParent: nil)
+        view.removeFromSuperview()
+        removeFromParent()
     }
 }
