@@ -39,8 +39,9 @@ final class DashboardViewController: UIViewController {
         navigationItem.largeTitleDisplayMode = .always
         navigationItem.title = "Game Counter"
         
+        startButton.titleLabel?.font = UIFont(name: "Nunito-ExtraBold", size: 24)
         startButton.setTitle("Start game", for: .normal)
-        
+        startButton.addTarget(self, action: #selector(start), for: .touchUpInside)
     }
     
     
@@ -64,5 +65,12 @@ final class DashboardViewController: UIViewController {
         } else {
             tableView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 20).isActive = true
         }
+    }
+    @objc func start(){
+        let rollViewController = RollViewController()
+
+        self.addChild(rollViewController)
+        view.addSubview(rollViewController.view)
+        rollViewController.didMove(toParent: self)
     }
 }
