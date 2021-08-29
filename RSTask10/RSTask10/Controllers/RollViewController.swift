@@ -6,7 +6,6 @@
 //
 
 import UIKit
-import AudioToolbox
 
 final class RollViewController: UIViewController {
 
@@ -21,7 +20,7 @@ final class RollViewController: UIViewController {
         let visualEffectView = UIVisualEffectView(effect: blurEffect)
         
         let imageView = UIImageView()
-        imageView.image = UIImage(named: "Four")
+        imageView.image = UIImage(named: ["One", "Two", "Three", "Four", "Five", "Six"].randomElement()!)
         
         visualEffectView.contentView.addSubview(imageView)
         view.addSubview(visualEffectView)

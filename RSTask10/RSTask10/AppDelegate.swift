@@ -18,7 +18,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         self.window = window
         setupAppearence()
         let navigationController = UINavigationController()
-        navigationController.viewControllers = [DashboardViewController(), NewPlayerViewController()]
+        navigationController.viewControllers = [DashboardViewController()]
         window.rootViewController = navigationController
         window.makeKeyAndVisible()
         return true

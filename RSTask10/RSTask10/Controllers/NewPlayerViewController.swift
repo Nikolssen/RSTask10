@@ -16,13 +16,16 @@ final class NewPlayerViewController: UIViewController {
         configureLayout()
         textField.addTarget(self, action: #selector(shouldEnableButton), for: .editingChanged)
     }
-
+    
+    var additionHandler: ((String) -> Void)?
+    
     func configureUI() {
         
         navigationController?.navigationBar.prefersLargeTitles = true
         navigationItem.largeTitleDisplayMode = .always
         navigationItem.title = "Add Player"
-        
+        navigationItem.backBarButtonItem = nil
+        navigationItem.leftBarButtonItem = UIBarButtonItem(title: "Back", style: .plain, target: self, action: #selector(goBack))
         navigationItem.backButtonTitle = "Back"
         
         navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Add", style: .plain, target: self, action:  #selector(addUser))
@@ -32,7 +35,7 @@ final class NewPlayerViewController: UIViewController {
         
         view.addSubview(textField)
         
-        view.backgroundColor = .init(named: "AppBackground")
+        view.backgroundColor = UIColor(named: "AppBackground")
         
         textField.tintColor = .white
         textField.font = UIFont(name: "Nunito-ExtraBold", size: 20)
@@ -58,10 +61,17 @@ final class NewPlayerViewController: UIViewController {
     }
     
     @objc func addUser(){
-        
+        if let additionHandler = additionHandler, let text = textField.text{
+            additionHandler(text)
+        }
+        navigationController?.popViewController(animated: true)
     }
     
     @objc func shouldEnableButton(){
         navigationItem.rightBarButtonItem?.isEnabled = !(textField.text?.isEmpty ?? true)
+    }
+    
+    @objc func goBack(){
+        navigationController?.popViewController(animated: true)
     }
 }

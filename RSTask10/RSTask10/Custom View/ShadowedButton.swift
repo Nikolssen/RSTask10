@@ -29,10 +29,10 @@ class ShadowedButton: UIButton {
         layer.masksToBounds = false
         titleLabel?.layer.masksToBounds = false
         
-        backgroundColor = .init(named: "AppJade")
+        backgroundColor = UIColor(named: "AppJade")
         
         setTitleColor(.white, for: .normal)
-        setTitleColor(.white.withAlphaComponent(0.5), for: .highlighted)
+        setTitleColor(UIColor.white.withAlphaComponent(0.5), for: .highlighted)
         
         titleLabel?.layer.shadowOffset = CGSize(width: 0, height: 2)
         titleLabel?.layer.shadowColor = UIColor(red: 0.33, green: 0.47, blue: 0.68, alpha: 1.0).cgColor
