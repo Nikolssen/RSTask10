@@ -8,7 +8,7 @@
 import UIKit
 
 final class DashboardViewController: UIViewController {
-
+    
     let startButton: ShadowedButton = ShadowedButton(frame: .zero)
     let tableView: UITableView = UITableView(frame: .zero, style: .grouped)
     var tableViewHeightConstraint: NSLayoutConstraint!
@@ -41,15 +41,21 @@ final class DashboardViewController: UIViewController {
         startButton.titleLabel?.font = UIFont(name: "Nunito-ExtraBold", size: 24)
         startButton.setTitle("Start game", for: .normal)
         startButton.addTarget(self, action: #selector(start), for: .touchUpInside)
-     
+        
+        startButton.isShadowed = true
+        
         tableView.separatorStyle = .singleLine
         tableView.separatorColor = UIColor(red: 0.333, green: 0.333, blue: 0.333, alpha: 1)
         tableView.allowsSelection = false
         
+        if let rootViewController = UIApplication.shared.delegate?.window??.rootViewController, rootViewController !== navigationController {
+            navigationItem.leftBarButtonItem = UIBarButtonItem(title: "Cancel", style: .plain, target: self, action: #selector(dismissView))
+        }
         
-        navigationItem.leftBarButtonItem = UIBarButtonItem(title: "Cancel", style: .plain, target: self, action: #selector(dismissView))
         
-
+        
+        
+        
     }
     
     
@@ -57,17 +63,16 @@ final class DashboardViewController: UIViewController {
         
         startButton.translatesAutoresizingMaskIntoConstraints = false
         tableView.translatesAutoresizingMaskIntoConstraints = false
-//        tableViewHeightConstraint =  tableView.heightAnchor.constraint(equalToConstant: 110)
+        tableViewHeightConstraint =  tableView.heightAnchor.constraint(equalToConstant: 110)
         NSLayoutConstraint.activate([
             startButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -65),
             startButton.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 20),
             startButton.centerXAnchor.constraint(equalTo: view.safeAreaLayoutGuide.centerXAnchor),
             startButton.heightAnchor.constraint(equalToConstant: 65),
             tableView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
-            tableView.bottomAnchor.constraint(equalTo: startButton.topAnchor),
             tableView.centerXAnchor.constraint(equalTo: view.safeAreaLayoutGuide.centerXAnchor),
-            tableView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 20)
-           
+            tableView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 20),
+            tableViewHeightConstraint
         ])
         
         
@@ -75,12 +80,13 @@ final class DashboardViewController: UIViewController {
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-       // tableViewHeightConstraint.constant =
+        let maximumHeight = view.safeAreaLayoutGuide.layoutFrame.height - 65 - 65 - 20
+        tableViewHeightConstraint.constant = min(maximumHeight, CGFloat(55 * (users.count + 1))) 
     }
     
     @objc func start(){
         let rollViewController = RollViewController()
-
+        
         self.addChild(rollViewController)
         view.addSubview(rollViewController.view)
         rollViewController.didMove(toParent: self)
@@ -106,29 +112,24 @@ extension DashboardViewController: UITableViewDelegate, UITableViewDataSource{
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: "dashboardID")!
+        let cell = tableView.dequeueReusableCell(withIdentifier: UserCell.id) as! UserCell
         if indexPath.row == users.count{
-            cell.textLabel?.font = UIFont(name: "Nunito-SemiBold", size: 16)
-            cell.textLabel?.text = "Add player"
-            cell.textLabel?.textColor = UIColor(named: "AppJade")
-            cell.imageView?.image = UIImage(named: "Add")
-
+            cell.style = .add
+            
         }
         
         else {
             
-            cell.imageView?.image = UIImage(named: "Delete")
-            cell.textLabel?.font = UIFont(name: "Nunito-ExtraBold", size: 20)
+            cell.style = .user
             cell.textLabel?.text = users[indexPath.row]
-            cell.textLabel?.textColor = UIColor.white
-            cell.imageView?.image = UIImage(named: "Delete")
+            
             
             
         }
         cell.backgroundColor = UIColor(named: "AppGrey")
         return cell
     }
-
+    
     func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
         return 55.0
     }
