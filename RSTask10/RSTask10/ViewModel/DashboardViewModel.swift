@@ -38,6 +38,10 @@ class DashboardViewModel {
             }
         }
     }
+    func deletePlayer(at index: Int){
+        players.remove(at: index)
+        onPlayerDelete?(index)
+    }
     
     init(coordinator: DashboardViewModelCoordinator){
         self.coordinator = coordinator

@@ -22,4 +22,16 @@ class GameViewModel {
         self.coordinator = coordinator
     }
     
+    func add(score: Int){
+        if score < 0 {
+            let absScore = abs(score)
+            if absScore <= players[currentPlayerIndex].score{
+                players[currentPlayerIndex].score -= UInt64(absScore)
+            }
+        }
+        else {
+            players[currentPlayerIndex].score += UInt64(score)
+        }
+    }
+    
 }

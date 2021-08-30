@@ -56,14 +56,18 @@ class Coordinator {
 
 extension Coordinator: DashboardViewModelCoordinator{
     func startGame(with players: [Player]) {
-        
+        let gameViewController = self.gameViewController
+        gameViewController.viewModel = GameViewModel(players: players, coordinator: self)
     }
     
     func addPlayer(handler: @escaping ((String) -> Bool)) {
-        let newPlayerViewController = newPlayerViewController
+        let newPlayerViewController = self.newPlayerViewController
         newPlayerViewController.viewModel.onPlayerAdd = handler
         if let modalNavigationController = modalNavigationController {
             modalNavigationController.pushViewController(newPlayerViewController, animated: true)
+        }
+        else {
+            rootViewController.pushViewController(newPlayerViewController, animated: true)
         }
     }
 }
@@ -73,6 +77,21 @@ extension Coordinator: NewPlayerViewModelCoordinator{
         if let modalNavigationController = modalNavigationController {
             modalNavigationController.popViewController(animated: true)
         }
+        else {
+            rootViewController.popViewController(animated: true)
+        }
+    }
+    
+    
+}
+
+extension Coordinator: GameViewModelCoordinator{
+    func showResults() {
+        
+    }
+    
+    func newGame() {
+        
     }
     
     

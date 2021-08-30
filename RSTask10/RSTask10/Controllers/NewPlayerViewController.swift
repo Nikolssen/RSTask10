@@ -30,7 +30,6 @@ final class NewPlayerViewController: UIViewController {
         navigationItem.backBarButtonItem = nil
         navigationItem.leftBarButtonItem = UIBarButtonItem(title: "Back", style: .plain, target: self, action: #selector(goBack))
         navigationItem.backButtonTitle = "Back"
-        
         navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Add", style: .plain, target: self, action:  #selector(addUser))
         navigationItem.rightBarButtonItem?.isEnabled = false
         
@@ -60,7 +59,7 @@ final class NewPlayerViewController: UIViewController {
     
     func configureViewModel(){
         viewModel.onAllert = {[unowned self] allert in
-            let allertController = UIAlertController(title: "Attention!", message: allert, preferredStyle: .actionSheet)
+            let allertController = UIAlertController(title: "Attention!", message: allert, preferredStyle: .alert)
             self.present(allertController, animated: true, completion: nil)
         }
     }

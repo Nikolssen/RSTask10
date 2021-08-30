@@ -10,9 +10,8 @@ import UIKit
 final class DashboardViewController: UIViewController {
     
     let startButton: ShadowedButton = ShadowedButton(frame: .zero)
-    let tableView: UITableView = UITableView(frame: .zero, style: .grouped)
+    let tableView: UITableView = UITableView(frame: .zero, style: .plain)
     var tableViewHeightConstraint: NSLayoutConstraint!
-    var users: [String] = ["Jane", "Ryan"]
     
     let topLabel: UILabel = UILabel()
     var viewModel: DashboardViewModel!
@@ -21,6 +20,7 @@ final class DashboardViewController: UIViewController {
         super.viewDidLoad()
         configureUI()
         configureLayout()
+        configureViewModel()
         
         tableView.delegate = self
         tableView.dataSource = self
@@ -40,7 +40,7 @@ final class DashboardViewController: UIViewController {
         view.backgroundColor = UIColor(named: "AppBackground")
         navigationController?.navigationBar.prefersLargeTitles = true
         navigationItem.largeTitleDisplayMode = .never
-        navigationController?.navigationBar.isTranslucent = true
+        navigationController?.navigationBar.isTranslucent = false
 
         
         startButton.titleLabel?.font = UIFont(name: "Nunito-ExtraBold", size: 24)
@@ -55,7 +55,7 @@ final class DashboardViewController: UIViewController {
         
         topLabel.font = UIFont(name: "Nunito-ExtraBold", size: 36.0)
         topLabel.text = "Game Counter"
-        
+        topLabel.textColor =  UIColor.white
         if let rootViewController = UIApplication.shared.delegate?.window??.rootViewController, rootViewController !== navigationController {
             navigationItem.leftBarButtonItem = UIBarButtonItem(title: "Cancel", style: .plain, target: self, action: #selector(dismissView))
         }
@@ -81,14 +81,20 @@ final class DashboardViewController: UIViewController {
             topLabel.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 20),
             topLabel.heightAnchor.constraint(equalToConstant: 42.0)
         ])
-        
-        
     }
     
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-        let maximumHeight = view.safeAreaLayoutGuide.layoutFrame.height - 65 - 65 - 20
-        tableViewHeightConstraint.constant = min(maximumHeight, CGFloat(55 * (users.count + 2)))
+    func configureViewModel(){
+        viewModel.onPlayerAdd = {[unowned self] in
+            self.tableView.reloadData()
+            let maximumHeight = view.safeAreaLayoutGuide.layoutFrame.height - 65 - 65 - 20 - 42 - 25
+            self.tableViewHeightConstraint.constant = min(maximumHeight, CGFloat(55 * (viewModel.players.count + 2)))
+        }
+        
+        viewModel.onPlayerDelete = {[unowned self] index in
+            self.tableView.reloadData()
+            let maximumHeight = view.safeAreaLayoutGuide.layoutFrame.height - 65 - 65 - 20 - 42 - 25
+            self.tableViewHeightConstraint.constant = min(maximumHeight, CGFloat(55 * (viewModel.players.count + 2)))
+        }
     }
     
     @objc func start(){
@@ -99,14 +105,6 @@ final class DashboardViewController: UIViewController {
         rollViewController.didMove(toParent: self)
     }
     
-    @objc func add(){
-        let newPlayerViewController = NewPlayerViewController()
-        newPlayerViewController.additionHandler = {[unowned self] string in
-            self.users.append(string)
-            self.tableView.reloadData()
-        }
-        navigationController?.pushViewController(newPlayerViewController, animated: true)
-    }
     
     @objc func dismissView() {
         navigationController?.dismiss(animated: true, completion: nil)
@@ -115,25 +113,25 @@ final class DashboardViewController: UIViewController {
 
 extension DashboardViewController: UITableViewDelegate, UITableViewDataSource{
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return users.count + 1
+        return viewModel.players.count + 1
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: UserCell.id) as! UserCell
-        if indexPath.row == users.count{
+        if indexPath.row == viewModel.players.count{
             cell.style = .add
-            cell.handler = {[indexPath, unowned self] in
+            cell.handler = {[unowned self] in
                 self.viewModel.addPlayer()
+                
             }
         }
         
         else {
             
             cell.style = .user
-            cell.textLabel?.text = users[indexPath.row]
-            cell.handler = { [unowned self] in
-                
-                self.tableView.deleteRows(at: [indexPath], with: .fade)
+            cell.textLabel?.text = viewModel.players[indexPath.row].name
+            cell.handler = { [unowned self, indexPath] in
+                self.viewModel.deletePlayer(at: indexPath.row)
             }
             
             

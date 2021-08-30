@@ -14,10 +14,13 @@ class ShadowedButton: UIButton {
     }
     var isShadowed: Bool = false {
         willSet{
-            layer.shadowRadius = 0
-            layer.shadowOpacity = 0.5
-            layer.shadowColor = UIColor(red: 0.33, green: 0.47, blue: 0.68, alpha: 1.0).cgColor
-            layer.shadowOffset = CGSize(width: 0, height: 5.0)
+            if (newValue){
+                layer.shadowOpacity = 0.5
+            }
+            else {
+                layer.shadowOpacity = 0.0
+            }
+
         }
     }
     private var path: UIBezierPath?
@@ -45,6 +48,10 @@ class ShadowedButton: UIButton {
         titleLabel?.layer.shadowColor = UIColor(red: 0.33, green: 0.47, blue: 0.68, alpha: 1.0).cgColor
         titleLabel?.layer.shadowOpacity = 0.5
         titleLabel?.layer.shadowRadius = 0
+        
+        layer.shadowRadius = 0
+        layer.shadowColor = UIColor(red: 0.33, green: 0.47, blue: 0.44, alpha: 1.0).cgColor
+        layer.shadowOffset = CGSize(width: 0, height: 5.0)
         
         
     }

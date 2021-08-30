@@ -11,15 +11,16 @@ import UIKit
 class AppDelegate: UIResponder, UIApplicationDelegate {
     
     var window: UIWindow?
-    
+    var coordinator: Coordinator!
     
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         let window = UIWindow(frame: UIScreen.main.bounds)
         self.window = window
         setupAppearence()
-        let navigationController = UINavigationController()
-        navigationController.viewControllers = [DashboardViewController()]
-        window.rootViewController = navigationController
+        
+        let coordinator = Coordinator(window: window)
+        coordinator.start()
+        
         window.makeKeyAndVisible()
         return true
     }
@@ -28,6 +29,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     func setupAppearence(){
         let navigationBarAppearence = UINavigationBar.appearance()
         navigationBarAppearence.largeTitleTextAttributes = [.font : UIFont(name: "Nunito-ExtraBold", size: 36)!, .foregroundColor: UIColor.white]
+        navigationBarAppearence.barTintColor = UIColor(named: "AppBackground")
+        navigationBarAppearence.backgroundColor = UIColor(named: "AppBackground")
+        navigationBarAppearence.setBackgroundImage(UIImage(), for: .default)
+        navigationBarAppearence.shadowImage = UIImage()
         
         let barButtonItemAppearence = UIBarButtonItem.appearance()
         barButtonItemAppearence.setTitleTextAttributes([.font: UIFont(name: "Nunito-ExtraBold", size: 17)!, .foregroundColor: UIColor(named: "AppJade")!], for: .normal)
