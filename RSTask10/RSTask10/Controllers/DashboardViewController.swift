@@ -14,6 +14,9 @@ final class DashboardViewController: UIViewController {
     var tableViewHeightConstraint: NSLayoutConstraint!
     var users: [String] = ["Jane", "Ryan"]
     
+    let topLabel: UILabel = UILabel()
+    var viewModel: DashboardViewModel!
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         configureUI()
@@ -21,7 +24,7 @@ final class DashboardViewController: UIViewController {
         
         tableView.delegate = self
         tableView.dataSource = self
-        tableView.register(UITableViewCell.self, forCellReuseIdentifier: "dashboardID")
+        tableView.register(UserCell.self, forCellReuseIdentifier: UserCell.id)
         
     }
     
@@ -31,12 +34,14 @@ final class DashboardViewController: UIViewController {
         
         view.addSubview(startButton)
         view.addSubview(tableView)
+        view.addSubview(topLabel)
         
         tableView.backgroundColor = UIColor(named: "AppGrey")
         view.backgroundColor = UIColor(named: "AppBackground")
         navigationController?.navigationBar.prefersLargeTitles = true
-        navigationItem.largeTitleDisplayMode = .always
-        navigationItem.title = "Game Counter"
+        navigationItem.largeTitleDisplayMode = .never
+        navigationController?.navigationBar.isTranslucent = true
+
         
         startButton.titleLabel?.font = UIFont(name: "Nunito-ExtraBold", size: 24)
         startButton.setTitle("Start game", for: .normal)
@@ -48,31 +53,33 @@ final class DashboardViewController: UIViewController {
         tableView.separatorColor = UIColor(red: 0.333, green: 0.333, blue: 0.333, alpha: 1)
         tableView.allowsSelection = false
         
+        topLabel.font = UIFont(name: "Nunito-ExtraBold", size: 36.0)
+        topLabel.text = "Game Counter"
+        
         if let rootViewController = UIApplication.shared.delegate?.window??.rootViewController, rootViewController !== navigationController {
             navigationItem.leftBarButtonItem = UIBarButtonItem(title: "Cancel", style: .plain, target: self, action: #selector(dismissView))
         }
-        
-        
-        
-        
-        
     }
     
     
     func configureLayout(){
-        
+        topLabel.translatesAutoresizingMaskIntoConstraints = false
         startButton.translatesAutoresizingMaskIntoConstraints = false
         tableView.translatesAutoresizingMaskIntoConstraints = false
         tableViewHeightConstraint =  tableView.heightAnchor.constraint(equalToConstant: 110)
         NSLayoutConstraint.activate([
+            
             startButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -65),
             startButton.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 20),
             startButton.centerXAnchor.constraint(equalTo: view.safeAreaLayoutGuide.centerXAnchor),
             startButton.heightAnchor.constraint(equalToConstant: 65),
-            tableView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
+            tableView.topAnchor.constraint(equalTo: topLabel.bottomAnchor, constant: 25),
             tableView.centerXAnchor.constraint(equalTo: view.safeAreaLayoutGuide.centerXAnchor),
             tableView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 20),
-            tableViewHeightConstraint
+            tableViewHeightConstraint,
+            topLabel.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
+            topLabel.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 20),
+            topLabel.heightAnchor.constraint(equalToConstant: 42.0)
         ])
         
         
@@ -81,7 +88,7 @@ final class DashboardViewController: UIViewController {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         let maximumHeight = view.safeAreaLayoutGuide.layoutFrame.height - 65 - 65 - 20
-        tableViewHeightConstraint.constant = min(maximumHeight, CGFloat(55 * (users.count + 1))) 
+        tableViewHeightConstraint.constant = min(maximumHeight, CGFloat(55 * (users.count + 2)))
     }
     
     @objc func start(){
@@ -102,7 +109,7 @@ final class DashboardViewController: UIViewController {
     }
     
     @objc func dismissView() {
-        dismiss(animated: true, completion: nil)
+        navigationController?.dismiss(animated: true, completion: nil)
     }
 }
 
@@ -115,14 +122,19 @@ extension DashboardViewController: UITableViewDelegate, UITableViewDataSource{
         let cell = tableView.dequeueReusableCell(withIdentifier: UserCell.id) as! UserCell
         if indexPath.row == users.count{
             cell.style = .add
-            
+            cell.handler = {[indexPath, unowned self] in
+                self.viewModel.addPlayer()
+            }
         }
         
         else {
             
             cell.style = .user
             cell.textLabel?.text = users[indexPath.row]
-            
+            cell.handler = { [unowned self] in
+                
+                self.tableView.deleteRows(at: [indexPath], with: .fade)
+            }
             
             
         }

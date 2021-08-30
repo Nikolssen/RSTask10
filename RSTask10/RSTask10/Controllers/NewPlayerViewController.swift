@@ -9,11 +9,14 @@ import UIKit
 
 final class NewPlayerViewController: UIViewController {
 
+    var viewModel: NewPlayerViewModel!
+    
     let textField: PlayerTextField = PlayerTextField(frame: .zero)
     override func viewDidLoad() {
         super.viewDidLoad()
         configureUI()
         configureLayout()
+        configureViewModel()
         textField.addTarget(self, action: #selector(shouldEnableButton), for: .editingChanged)
     }
     
@@ -55,14 +58,21 @@ final class NewPlayerViewController: UIViewController {
         ])
     }
     
+    func configureViewModel(){
+        viewModel.onAllert = {[unowned self] allert in
+            let allertController = UIAlertController(title: "Attention!", message: allert, preferredStyle: .actionSheet)
+            self.present(allertController, animated: true, completion: nil)
+        }
+    }
+    
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         textField.becomeFirstResponder()
     }
     
     @objc func addUser(){
-        if let additionHandler = additionHandler, let text = textField.text{
-            additionHandler(text)
+        if let text = textField.text{
+            viewModel.add(name: text)
         }
         navigationController?.popViewController(animated: true)
     }
@@ -72,6 +82,7 @@ final class NewPlayerViewController: UIViewController {
     }
     
     @objc func goBack(){
+        
         navigationController?.popViewController(animated: true)
     }
 }
