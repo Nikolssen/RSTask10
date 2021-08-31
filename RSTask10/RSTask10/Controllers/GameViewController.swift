@@ -25,6 +25,12 @@ final class GameViewController: UIViewController {
     
     var viewModel: GameViewModel!
     
+    
+    var timer: Timer?
+    var startTime: TimeInterval?
+    var stopTime: TimeInterval?
+    var isTimerActive: Bool = true
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         configureUI()
@@ -61,7 +67,7 @@ final class GameViewController: UIViewController {
         buttons.forEach {
             stackView.addArrangedSubview($0)
             $0.titleLabel?.font = UIFont(name: "Nunito-ExtraBold", size: 25)
-            $0.addTarget(self, action: #selector(addButtonTapped), for: .touchUpInside)
+            $0.addTarget(self, action: #selector(addButtonTapped(sender:)), for: .touchUpInside)
         }
         
         buttons[0].setTitle("-10", for: .normal)
@@ -72,6 +78,7 @@ final class GameViewController: UIViewController {
         
         oneButton.titleLabel?.font = UIFont(name: "Nunito-ExtraBold", size: 40)
         oneButton.setTitle("+1", for: .normal)
+        oneButton.addTarget(self, action: #selector(addButtonTapped(sender:)), for: .touchUpInside)
         
         diceButton.setImage(UIImage(named: "Four"), for: .normal)
         diceButton.addTarget(self, action: #selector(showDice), for: .touchUpInside)
@@ -91,11 +98,12 @@ final class GameViewController: UIViewController {
         
         collectionView.backgroundColor = UIColor(named: "AppBackground")
         collectionView.showsHorizontalScrollIndicator = false
+        collectionView.isPagingEnabled = false
         
         timerLabel.font = UIFont(name: "Nunito-ExtraBold", size: 28)
         timerLabel.textColor = UIColor.white
         timerLabel.text = "00:00"
-        
+        startTimer()
         playButton.setImage(UIImage(named: "Pause"), for: .normal)
         playButton.addTarget(self, action: #selector(stopAndPlay), for: .touchUpInside)
         
@@ -183,16 +191,39 @@ final class GameViewController: UIViewController {
         
     }
     
-    @objc func addButtonTapped(){
-        
+    override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+        scrollToCurrentIndex()
+    }
+    
+    @objc func addButtonTapped(sender: UIButton){
+        if sender === oneButton {
+            viewModel.add(score: 1)
+        }
+        if sender === buttons[0]{
+            viewModel.add(score: -10)
+        }
+        if sender === buttons[1]{
+            viewModel.add(score: -5)
+        }
+        if sender === buttons[2]{
+            viewModel.add(score: -1)
+        }
+        if sender === buttons[3]{
+            viewModel.add(score: 5)
+        }
+        if sender === buttons[4]{
+            viewModel.add(score: 10)
+        }
+        collectionView.reloadItems(at: [IndexPath(item: viewModel.currentPlayerIndex, section: 0)])
     }
     
     @objc func newGame(){
-        
+        viewModel.newGame()
     }
     
     @objc func showResults(){
-        
+        viewModel.showResults()
     }
     
     @objc func showDice(){
@@ -207,19 +238,83 @@ final class GameViewController: UIViewController {
     }
     
     @objc func stopAndPlay(){
-        
+        if isTimerActive {
+            timerLabel.textColor = UIColor(named: "AppGrey")
+            playButton.setImage(UIImage(named: "Play"), for: .normal)
+            stopTimer()
+        }
+        else {
+            timerLabel.textColor = .white
+            playButton.setImage(UIImage(named: "Pause"), for: .normal)
+            startTimer()
+        }
     }
     
     @objc func nextPlayer(){
-        
+        if (viewModel.currentPlayerIndex == viewModel.players.count - 1){
+            viewModel.currentPlayerIndex = 0
+        }
+        else {
+            viewModel.currentPlayerIndex += 1
+        }
+        resetTimer()
+        startTimer()
+        scrollToCurrentIndex()
     }
     
     @objc func previousPlayer(){
-        
+        if (viewModel.currentPlayerIndex == 0){
+            viewModel.currentPlayerIndex = viewModel.players.count - 1
+        }
+        else {
+            viewModel.currentPlayerIndex -= 1
+        }
+        resetTimer()
+        startTimer()
+        scrollToCurrentIndex()
     }
     
     @objc func back(){
+        viewModel.resetTurn()
+        collectionView.reloadItems(at: [IndexPath(row: viewModel.currentPlayerIndex, section: 0)])
+    }
+    
+    func startTimer(){
+        let timer = Timer.scheduledTimer(timeInterval: 0.01, target: self, selector: #selector(updateTimerLabel), userInfo: nil, repeats: true)
+
+        self.timer = timer
         
+        if self.startTime != nil, let stopTime = self.stopTime {
+            self.startTime! += (Date.timeIntervalSinceReferenceDate - stopTime)
+        }
+        else {
+            self.startTime = Date.timeIntervalSinceReferenceDate
+        }
+        isTimerActive = true
+    }
+    
+    func stopTimer(){
+
+        stopTime = Date.timeIntervalSinceReferenceDate
+        isTimerActive = false
+    }
+    
+    func resetTimer(){
+        startTime = nil
+        stopTime = nil
+        timer?.invalidate()
+        isTimerActive = false
+    }
+    
+    @objc func updateTimerLabel(){
+        guard let startTime = startTime else {return}
+        let currentTime = Date.timeIntervalSinceReferenceDate
+        let value: TimeInterval = currentTime - startTime
+        let minutes: Int = Int(value / 60)
+        let seconds: Int = Int(value - Double(minutes) * 60.0)
+        
+        let string = String(format: "%02d:%02d", minutes, seconds)
+        timerLabel.text = string
     }
 }
 
@@ -266,5 +361,19 @@ extension GameViewController: UICollectionViewDelegate, UICollectionViewDelegate
         
         return CGSize(width: width, height: height)
     }
+    
+    func scrollViewWillEndDragging(_ scrollView: UIScrollView, withVelocity velocity: CGPoint, targetContentOffset: UnsafeMutablePointer<CGPoint>) {
+        let pageWidth = collectionView(collectionView, layout: collectionView.collectionViewLayout, sizeForItemAt: IndexPath(item: 0, section: 0)).width + 20
+        viewModel.currentPlayerIndex = (velocity.x == 0) ? Int(floor((targetContentOffset.pointee.x - pageWidth / 2) / pageWidth) + 1.0 ) : (velocity.x > 0 ? viewModel.currentPlayerIndex + 1: viewModel.currentPlayerIndex - 1)
+        targetContentOffset.pointee = CGPoint(x: pageWidth * CGFloat(viewModel.currentPlayerIndex), y: targetContentOffset.pointee.y)
+    }
+    
+
+    func scrollToCurrentIndex(){
+        let pageWidth = collectionView(collectionView, layout: collectionView.collectionViewLayout, sizeForItemAt: IndexPath(item: 0, section: 0)).width + 20
+        let offset = CGPoint(x: CGFloat(viewModel.currentPlayerIndex) * pageWidth, y: 0)
+        collectionView.setContentOffset(offset, animated: true)
+    }
+    
     
 }

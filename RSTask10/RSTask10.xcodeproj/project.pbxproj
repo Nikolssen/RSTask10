@@ -27,6 +27,7 @@
 		3FD81E0B26DD30470015675D /* GameViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3FD81E0A26DD30470015675D /* GameViewModel.swift */; };
 		3FD81E0D26DD30CD0015675D /* ResultsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3FD81E0C26DD30CD0015675D /* ResultsViewModel.swift */; };
 		3FF743DC26DE590500D736D6 /* DiceView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3FF743DB26DE590500D736D6 /* DiceView.swift */; };
+		8422E5B026DEAD17008F3B38 /* Turn.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8422E5AF26DEAD17008F3B38 /* Turn.swift */; };
 		84FE66F126DC258A00DE8F57 /* CarouselCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84FE66F026DC258A00DE8F57 /* CarouselCell.swift */; };
 		84FE66F426DC2A2800DE8F57 /* UserCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84FE66F326DC2A2800DE8F57 /* UserCell.swift */; };
 /* End PBXBuildFile section */
@@ -54,6 +55,7 @@
 		3FD81E0A26DD30470015675D /* GameViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameViewModel.swift; sourceTree = "<group>"; };
 		3FD81E0C26DD30CD0015675D /* ResultsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResultsViewModel.swift; sourceTree = "<group>"; };
 		3FF743DB26DE590500D736D6 /* DiceView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiceView.swift; sourceTree = "<group>"; };
+		8422E5AF26DEAD17008F3B38 /* Turn.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Turn.swift; sourceTree = "<group>"; };
 		84FE66F026DC258A00DE8F57 /* CarouselCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CarouselCell.swift; sourceTree = "<group>"; };
 		84FE66F326DC2A2800DE8F57 /* UserCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserCell.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -148,6 +150,7 @@
 			isa = PBXGroup;
 			children = (
 				3F768A4626DCB9B700684F24 /* Player.swift */,
+				8422E5AF26DEAD17008F3B38 /* Turn.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -253,6 +256,7 @@
 				3FD81E0D26DD30CD0015675D /* ResultsViewModel.swift in Sources */,
 				3F2A1A4C26D67630004923BA /* NewPlayerViewController.swift in Sources */,
 				3F2A1A2A26D624AE004923BA /* AppDelegate.swift in Sources */,
+				8422E5B026DEAD17008F3B38 /* Turn.swift in Sources */,
 				3F768A4A26DCBD2C00684F24 /* Coordinator.swift in Sources */,
 				3F768A4D26DCBED700684F24 /* StatusService.swift in Sources */,
 				3F2A1A5726D68DFB004923BA /* PlayerTextField.swift in Sources */,

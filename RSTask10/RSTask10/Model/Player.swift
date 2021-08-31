@@ -9,7 +9,7 @@ import Foundation
 
 struct Player {
     
-    var score: UInt64 = 0
+    var score: Int = 0
     let name: String
     
     init(name: String){

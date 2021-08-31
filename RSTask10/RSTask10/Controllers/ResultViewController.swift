@@ -9,10 +9,12 @@ import UIKit
 
 final class ResultViewController: UIViewController {
 
+    let headerLabel: UILabel = UILabel()
+    
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        // Do any additional setup after loading the view.
+        
     }
     
 }

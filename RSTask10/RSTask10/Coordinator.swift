@@ -86,11 +86,15 @@ extension Coordinator: NewPlayerViewModelCoordinator{
 
 extension Coordinator: GameViewModelCoordinator{
     func showResults() {
-        
+        let resultViewController = ResultViewController()
+        rootViewController.pushViewController(resultViewController, animated: true)
     }
     
     func newGame() {
-        
+        let dashboardViewController = self.dashboardViewController
+        let modalNavigationController = UINavigationController(rootViewController: dashboardViewController)
+        self.modalNavigationController = modalNavigationController
+        rootViewController.present(modalNavigationController, animated: true, completion: nil)
     }
     
     

@@ -13,25 +13,46 @@ protocol GameViewModelCoordinator {
 
 class GameViewModel {
     
-    var currentPlayerIndex: Int = 0
+    var currentPlayerIndex: Int {
+        willSet{
+            turns.append(Turn(player: players[newValue].name, scoreChange: 0))
+        }
+    }
     var players: [Player]
+    var turns: [Turn] = .init()
     let coordinator: GameViewModelCoordinator
     
     init(players: [Player], coordinator: GameViewModelCoordinator) {
         self.players = players
         self.coordinator = coordinator
+        currentPlayerIndex = 0
+        turns.append(Turn(player: players[0].name, scoreChange: 0))
     }
     
     func add(score: Int){
         if score < 0 {
             let absScore = abs(score)
             if absScore <= players[currentPlayerIndex].score{
-                players[currentPlayerIndex].score -= UInt64(absScore)
+                players[currentPlayerIndex].score -= absScore
             }
         }
         else {
-            players[currentPlayerIndex].score += UInt64(score)
+            players[currentPlayerIndex].score += score
         }
+        turns[turns.count - 1].scoreChange += score
+    }
+    
+    func resetTurn(){
+        players[currentPlayerIndex].score -= turns[turns.count - 1].scoreChange
+        turns[turns.count - 1].scoreChange = 0
+    }
+    
+    func showResults(){
+        coordinator.showResults()
+    }
+    
+    func newGame(){
+        coordinator.newGame()
     }
     
 }
