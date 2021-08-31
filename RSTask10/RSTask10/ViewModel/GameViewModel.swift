@@ -7,7 +7,7 @@
 
 import Foundation
 protocol GameViewModelCoordinator {
-    func showResults()
+    func showResults(players: [Player], turns: [Turn])
     func newGame()
 }
 
@@ -16,11 +16,14 @@ class GameViewModel {
     var currentPlayerIndex: Int {
         willSet{
             turns.append(Turn(player: players[newValue].name, scoreChange: 0))
+            onNewTurn?()
         }
     }
     var players: [Player]
     var turns: [Turn] = .init()
     let coordinator: GameViewModelCoordinator
+    
+    var onNewTurn: (()-> Void)?
     
     init(players: [Player], coordinator: GameViewModelCoordinator) {
         self.players = players
@@ -48,7 +51,7 @@ class GameViewModel {
     }
     
     func showResults(){
-        coordinator.showResults()
+        coordinator.showResults(players: players, turns: turns)
     }
     
     func newGame(){

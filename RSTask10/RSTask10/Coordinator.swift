@@ -85,8 +85,10 @@ extension Coordinator: NewPlayerViewModelCoordinator{
 }
 
 extension Coordinator: GameViewModelCoordinator{
-    func showResults() {
+    func showResults(players: [Player], turns: [Turn]) {
         let resultViewController = ResultViewController()
+        let resultViewModel = ResultsViewModel(coordinator: self, players: players, turns: turns)
+        resultViewController.viewModel = resultViewModel
         rootViewController.pushViewController(resultViewController, animated: true)
     }
     
@@ -95,6 +97,18 @@ extension Coordinator: GameViewModelCoordinator{
         let modalNavigationController = UINavigationController(rootViewController: dashboardViewController)
         self.modalNavigationController = modalNavigationController
         rootViewController.present(modalNavigationController, animated: true, completion: nil)
+    }
+    
+    
+}
+
+extension Coordinator: ResultsViewModelCoordinator{
+    func newGameFromResults() {
+        
+    }
+    
+    func resume() {
+        rootViewController.popViewController(animated: true)
     }
     
     

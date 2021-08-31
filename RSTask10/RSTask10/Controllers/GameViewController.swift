@@ -40,6 +40,24 @@ final class GameViewController: UIViewController {
         collectionView.delegate = self
         collectionView.dataSource = self
         collectionView.register(CarouselCell.self, forCellWithReuseIdentifier: CarouselCell.id)
+        
+        viewModel.onNewTurn = {[unowned self] in
+            if self.viewModel.currentPlayerIndex == 0 {
+                leftButton.setImage(UIImage(named: "ToEnd"), for: .normal)
+            }
+            else {
+                leftButton.setImage(UIImage(named: "Backward"), for: .normal)
+            }
+            if self.viewModel.currentPlayerIndex == self.viewModel.players.count - 1{
+                rightButton.setImage(UIImage(named: "ToStart"), for: .normal)
+            }
+            else {
+                rightButton.setImage(UIImage(named: "Forward"), for: .normal)
+            }
+            self.resetTimer()
+            self.startTimer()
+           
+        }
     }
     
     func configureUI(){
@@ -184,10 +202,10 @@ final class GameViewController: UIViewController {
             
             
         ])
-        
         let collectionViewLayout = (collectionView.collectionViewLayout as! UICollectionViewFlowLayout)
         collectionViewLayout.scrollDirection = .horizontal
         collectionViewLayout.minimumLineSpacing = 20
+
         
     }
     
@@ -257,8 +275,6 @@ final class GameViewController: UIViewController {
         else {
             viewModel.currentPlayerIndex += 1
         }
-        resetTimer()
-        startTimer()
         scrollToCurrentIndex()
     }
     
@@ -269,8 +285,7 @@ final class GameViewController: UIViewController {
         else {
             viewModel.currentPlayerIndex -= 1
         }
-        resetTimer()
-        startTimer()
+
         scrollToCurrentIndex()
     }
     
@@ -315,6 +330,10 @@ final class GameViewController: UIViewController {
         
         let string = String(format: "%02d:%02d", minutes, seconds)
         timerLabel.text = string
+    }
+    
+    deinit {
+        timer?.invalidate()
     }
 }
 
@@ -362,6 +381,13 @@ extension GameViewController: UICollectionViewDelegate, UICollectionViewDelegate
         return CGSize(width: width, height: height)
     }
     
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, insetForSectionAt section: Int) -> UIEdgeInsets {
+        
+        let cellWidth = self.collectionView(collectionView, layout: collectionView.collectionViewLayout, sizeForItemAt: IndexPath(item: 0, section: 0)).width
+        let sideInset = (view.frame.width - cellWidth) / 2
+        return UIEdgeInsets(top: 0, left: sideInset, bottom: 0, right: sideInset)
+    }
+    
     func scrollViewWillEndDragging(_ scrollView: UIScrollView, withVelocity velocity: CGPoint, targetContentOffset: UnsafeMutablePointer<CGPoint>) {
         let pageWidth = collectionView(collectionView, layout: collectionView.collectionViewLayout, sizeForItemAt: IndexPath(item: 0, section: 0)).width + 20
         viewModel.currentPlayerIndex = (velocity.x == 0) ? Int(floor((targetContentOffset.pointee.x - pageWidth / 2) / pageWidth) + 1.0 ) : (velocity.x > 0 ? viewModel.currentPlayerIndex + 1: viewModel.currentPlayerIndex - 1)
@@ -374,6 +400,5 @@ extension GameViewController: UICollectionViewDelegate, UICollectionViewDelegate
         let offset = CGPoint(x: CGFloat(viewModel.currentPlayerIndex) * pageWidth, y: 0)
         collectionView.setContentOffset(offset, animated: true)
     }
-    
     
 }
