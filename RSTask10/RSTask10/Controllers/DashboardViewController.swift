@@ -48,6 +48,7 @@ final class DashboardViewController: UIViewController {
         startButton.addTarget(self, action: #selector(start), for: .touchUpInside)
         
         startButton.isShadowed = true
+        startButton.isEnabled = false
         
         tableView.separatorStyle = .singleLine
         tableView.separatorColor = UIColor(red: 0.333, green: 0.333, blue: 0.333, alpha: 1)
@@ -88,22 +89,25 @@ final class DashboardViewController: UIViewController {
             self.tableView.reloadData()
             let maximumHeight = view.safeAreaLayoutGuide.layoutFrame.height - Constants.tableViewOffsetLimit
             self.tableViewHeightConstraint.constant = min(maximumHeight, Constants.cellHeight * CGFloat(viewModel.players.count + 2))
+            if self.viewModel.players.count > 0 {
+                self.startButton.isEnabled = true
+            }
         }
         
         viewModel.onPlayerDelete = {[unowned self] index in
             self.tableView.deleteRows(at: [IndexPath(row: index, section: 0)], with: .fade)
             let maximumHeight = view.safeAreaLayoutGuide.layoutFrame.height - Constants.tableViewOffsetLimit
             self.tableViewHeightConstraint.constant = min(maximumHeight, Constants.cellHeight * CGFloat(viewModel.players.count + 2))
+            
+            if self.viewModel.players.count == 0 {
+                self.startButton.isEnabled = false
+            }
             self.tableView.reloadData()
         }
     }
     
     @objc func start(){
-        let rollViewController = RollViewController()
-        
-        self.addChild(rollViewController)
-        view.addSubview(rollViewController.view)
-        rollViewController.didMove(toParent: self)
+        viewModel.startGame()
     }
     
     

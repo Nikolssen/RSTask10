@@ -23,6 +23,17 @@ class ShadowedButton: UIButton {
 
         }
     }
+    
+    override var isEnabled: Bool{
+        willSet {
+            if newValue{
+                alpha = 1.0
+            }
+            else{
+                alpha = 0.6
+            }
+        }
+    }
     private var path: UIBezierPath?
 
     override init(frame: CGRect) {
