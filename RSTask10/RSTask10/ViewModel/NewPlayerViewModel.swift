@@ -14,7 +14,7 @@ class NewPlayerViewModel {
     let coordinator: NewPlayerViewModelCoordinator
     
     var onPlayerAdd: ((String) -> Bool)?
-    var onAllert: ((String) -> Void)?
+    var onAlert: ((String) -> Void)?
     
     init(coordinator: NewPlayerViewModelCoordinator){
         self.coordinator = coordinator
@@ -24,13 +24,16 @@ class NewPlayerViewModel {
         
         guard let onPlayerAdd = onPlayerAdd else {return}
 
-        if onPlayerAdd(name)
-        {
+        if onPlayerAdd(name) {
             coordinator.dismiss()
+            
+        } else {
+            onAlert?("The player with name \"\(name)\" already exists!")
         }
-        else {
-            onAllert?("The player with name \"\(name)\" already exists!")
-        }
+    }
+    
+    func goBack(){
+        coordinator.dismiss()
     }
     
     

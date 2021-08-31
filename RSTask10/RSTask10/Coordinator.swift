@@ -81,8 +81,6 @@ extension Coordinator: NewPlayerViewModelCoordinator{
             rootViewController.popViewController(animated: true)
         }
     }
-    
-    
 }
 
 extension Coordinator: GameViewModelCoordinator{
