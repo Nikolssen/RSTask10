@@ -58,6 +58,7 @@ extension Coordinator: DashboardViewModelCoordinator{
     func startGame(with players: [Player]) {
         let gameViewController = self.gameViewController
         gameViewController.viewModel = GameViewModel(players: players, coordinator: self)
+        rootViewController.setViewControllers([gameViewController], animated: true)
     }
     
     func addPlayer(handler: @escaping ((String) -> Bool)) {

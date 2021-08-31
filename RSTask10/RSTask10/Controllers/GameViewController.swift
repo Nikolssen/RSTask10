@@ -9,8 +9,8 @@ import UIKit
 
 final class GameViewController: UIViewController {
 
-    let collectionView = UICollectionView()
-    let topLabel = UILabel()
+    let collectionView = UICollectionView(frame: .zero, collectionViewLayout: UICollectionViewFlowLayout())
+    let headerLabel = UILabel()
     let diceButton = UIButton()
     let timerLabel = UILabel()
     let playButton = UIButton()
@@ -18,6 +18,7 @@ final class GameViewController: UIViewController {
     let backButton = UIButton()
     let leftButton = UIButton()
     let rightButton = UIButton()
+    let diceView = DiceView(frame: .zero)
     
     let buttons: [ShadowedButton] = [.init(), .init(), .init(), .init(), .init()]
     let oneButton: ShadowedButton = ShadowedButton()
@@ -26,10 +27,17 @@ final class GameViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        configureUI()
+        configureLayout()
 
 
-        
-        view.addSubview(topLabel)
+        collectionView.delegate = self
+        collectionView.dataSource = self
+        collectionView.register(CarouselCell.self, forCellWithReuseIdentifier: CarouselCell.id)
+    }
+    
+    func configureUI(){
+        view.addSubview(headerLabel)
         view.addSubview(collectionView)
         view.addSubview(diceButton)
         view.addSubview(timerLabel)
@@ -38,19 +46,22 @@ final class GameViewController: UIViewController {
         view.addSubview(backButton)
         view.addSubview(leftButton)
         view.addSubview(rightButton)
+        view.addSubview(stackView)
+        view.addSubview(diceView)
         
-        let stackView = self.stackView
-        stackView.axis = .horizontal
-        stackView.distribution = .fill
-        stackView.alignment = .fill
-        stackView.spacing = 15
+        view.backgroundColor = UIColor(named: "AppBackground")
         
-        stackView.translatesAutoresizingMaskIntoConstraints = false
+        navigationItem.leftBarButtonItem = UIBarButtonItem(title: "New Game", style: .plain, target: self, action: #selector(newGame))
+        navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Results", style: .plain, target: self, action: #selector(showResults))
+        
+        headerLabel.text = "Game"
+        headerLabel.font = UIFont(name: "Nunito-ExtraBold", size: 36.0)
+        headerLabel.textColor =  UIColor.white
         
         buttons.forEach {
             stackView.addArrangedSubview($0)
             $0.titleLabel?.font = UIFont(name: "Nunito-ExtraBold", size: 25)
-            $0.addTarget(self, action: #selector(buttonAdd), for: .touchUpInside)
+            $0.addTarget(self, action: #selector(addButtonTapped), for: .touchUpInside)
         }
         
         buttons[0].setTitle("-10", for: .normal)
@@ -63,13 +74,36 @@ final class GameViewController: UIViewController {
         oneButton.setTitle("+1", for: .normal)
         
         diceButton.setImage(UIImage(named: "Four"), for: .normal)
+        diceButton.addTarget(self, action: #selector(showDice), for: .touchUpInside)
+
         
-        topLabel.text = "Game"
+        diceView.isHidden = true
+        diceView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(hideDice)))
+        
+        leftButton.setImage(UIImage(named: "Backward"), for: .normal)
+        leftButton.addTarget(self, action: #selector(previousPlayer), for: .touchUpInside)
+        
+        rightButton.setImage(UIImage(named: "Forward"), for: .normal)
+        rightButton.addTarget(self, action: #selector(nextPlayer), for: .touchUpInside)
+        
+        backButton.setImage(UIImage(named: "CurveBack"), for: .normal)
+        backButton.addTarget(self, action: #selector(back), for: .touchUpInside)
+        
+        collectionView.backgroundColor = UIColor(named: "AppBackground")
+        collectionView.showsHorizontalScrollIndicator = false
+        
+        timerLabel.font = UIFont(name: "Nunito-ExtraBold", size: 28)
+        timerLabel.textColor = UIColor.white
+        timerLabel.text = "00:00"
+        
+        playButton.setImage(UIImage(named: "Pause"), for: .normal)
+        playButton.addTarget(self, action: #selector(stopAndPlay), for: .touchUpInside)
         
     }
     
     func configureLayout(){
-        topLabel.translatesAutoresizingMaskIntoConstraints = false
+        let multiplier: CGFloat = (view.safeAreaLayoutGuide.layoutFrame.height / Constants.verticalHeight)
+        headerLabel.translatesAutoresizingMaskIntoConstraints = false
         collectionView.translatesAutoresizingMaskIntoConstraints = false
         diceButton.translatesAutoresizingMaskIntoConstraints = false
         timerLabel.translatesAutoresizingMaskIntoConstraints = false
@@ -78,23 +112,159 @@ final class GameViewController: UIViewController {
         buttons.forEach {
             $0.translatesAutoresizingMaskIntoConstraints = false
         }
+        diceView.translatesAutoresizingMaskIntoConstraints = false
         
         stackView.translatesAutoresizingMaskIntoConstraints = false
+        backButton.translatesAutoresizingMaskIntoConstraints = false
+        leftButton.translatesAutoresizingMaskIntoConstraints = false
+        rightButton.translatesAutoresizingMaskIntoConstraints = false
         
         stackView.axis = .horizontal
-        stackView.spacing = (view.safeAreaLayoutGuide.layoutFrame.width - (55 * 5) - 40) / 4
+        stackView.spacing = (view.safeAreaLayoutGuide.layoutFrame.width - (Constants.stackViewButtonWidth * multiplier * 5) - 2 * Constants.horizontalOffset) / 4
         stackView.alignment = .fill
         stackView.distribution = .fillEqually
         
         NSLayoutConstraint.activate([
-            stackView.heightAnchor.constraint(equalToConstant: 55),
-            stackView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
+            
+            stackView.heightAnchor.constraint(equalToConstant: Constants.stackViewButtonWidth * multiplier),
+            stackView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: Constants.horizontalOffset),
             stackView.centerXAnchor.constraint(equalTo: view.safeAreaLayoutGuide.centerXAnchor),
-            stackView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -75.0)
+            stackView.bottomAnchor.constraint(equalTo: backButton.topAnchor, constant: -Constants.stackViewBottomOffset * multiplier),
+            
+            diceButton.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -Constants.horizontalOffset),
+            diceButton.heightAnchor.constraint(equalToConstant: Constants.diceButtonWidth),
+            diceButton.widthAnchor.constraint(equalToConstant: Constants.diceButtonWidth),
+            diceButton.centerYAnchor.constraint(equalTo: headerLabel.centerYAnchor),
+            headerLabel.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
+            headerLabel.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: Constants.horizontalOffset),
+            headerLabel.heightAnchor.constraint(equalToConstant: Constants.headerLabelHeight),
+            
+            oneButton.widthAnchor.constraint(equalToConstant: Constants.oneButtonWidth * multiplier),
+            oneButton.heightAnchor.constraint(equalToConstant: Constants.oneButtonWidth * multiplier),
+            oneButton.bottomAnchor.constraint(equalTo: stackView.topAnchor, constant: -Constants.oneButtonVerticalOffset),
+            oneButton.centerXAnchor.constraint(equalTo: view.safeAreaLayoutGuide.centerXAnchor),
+            
+            diceView.topAnchor.constraint(equalTo: view.topAnchor),
+            diceView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
+            diceView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            diceView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            
+            backButton.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: Constants.backButtonOffset),
+            backButton.widthAnchor.constraint(equalToConstant: Constants.backButtonWidth),
+            backButton.heightAnchor.constraint(equalToConstant: Constants.backButtonHeight),
+            backButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -Constants.bottomOffset * multiplier),
+            
+            leftButton.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: Constants.arrowsOffset),
+            leftButton.heightAnchor.constraint(equalToConstant: Constants.diceButtonWidth),
+            leftButton.widthAnchor.constraint(equalToConstant: Constants.diceButtonWidth),
+            leftButton.centerYAnchor.constraint(equalTo: oneButton.centerYAnchor),
+            
+            rightButton.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -Constants.arrowsOffset),
+            rightButton.heightAnchor.constraint(equalToConstant: Constants.diceButtonWidth),
+            rightButton.widthAnchor.constraint(equalToConstant: Constants.diceButtonWidth),
+            rightButton.centerYAnchor.constraint(equalTo: oneButton.centerYAnchor),
+            
+            collectionView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor),
+            collectionView.centerXAnchor.constraint(equalTo: view.safeAreaLayoutGuide.centerXAnchor),
+            collectionView.heightAnchor.constraint(equalTo: view.safeAreaLayoutGuide.widthAnchor, multiplier: Constants.collectionViewWidthToHeightMultiplier),
+            collectionView.bottomAnchor.constraint(equalTo: oneButton.topAnchor, constant: -Constants.collectionViewBottomOffset * multiplier),
+            
+            timerLabel.topAnchor.constraint(equalTo: headerLabel.bottomAnchor, constant: Constants.timerInterSpacing * multiplier),
+            timerLabel.centerXAnchor.constraint(equalTo: view.safeAreaLayoutGuide.centerXAnchor),
+            playButton.centerYAnchor.constraint(equalTo: timerLabel.centerYAnchor),
+            playButton.leftAnchor.constraint(equalTo: timerLabel.rightAnchor, constant: Constants.horizontalOffset)
+            
+            
         ])
-    }
-    
-    @objc func buttonAdd(){
+        
+        let collectionViewLayout = (collectionView.collectionViewLayout as! UICollectionViewFlowLayout)
+        collectionViewLayout.scrollDirection = .horizontal
+        collectionViewLayout.minimumLineSpacing = 20
         
     }
+    
+    @objc func addButtonTapped(){
+        
+    }
+    
+    @objc func newGame(){
+        
+    }
+    
+    @objc func showResults(){
+        
+    }
+    
+    @objc func showDice(){
+        UIImpactFeedbackGenerator(style: .medium).impactOccurred()
+        navigationController?.setNavigationBarHidden(true, animated: false)
+        diceView.isHidden = false
+    }
+    
+    @objc func hideDice(){
+        diceView.isHidden = true
+        navigationController?.setNavigationBarHidden(false, animated: false)
+    }
+    
+    @objc func stopAndPlay(){
+        
+    }
+    
+    @objc func nextPlayer(){
+        
+    }
+    
+    @objc func previousPlayer(){
+        
+    }
+    
+    @objc func back(){
+        
+    }
+}
+
+extension GameViewController{
+    enum Constants{
+        static let headerLabelHeight: CGFloat = 42.0
+        static let horizontalOffset: CGFloat = 20.0
+        static let arrowsOffset: CGFloat = 45.0
+        static let backButtonOffset: CGFloat = 40.0
+        static let backButtonWidth: CGFloat = 15.0
+        static let backButtonHeight: CGFloat = 20.0
+        static let bottomOffset: CGFloat = 30.0
+        static let diceButtonWidth: CGFloat = 30.0
+        static let oneButtonWidth: CGFloat = 90.0
+        static let oneButtonVerticalOffset: CGFloat = 22.0
+        static let collectionViewBottomOffset: CGFloat = 28.0
+        static let stackViewButtonWidth: CGFloat = 55.0
+        static let collectionViewCellHeightToWidthAspectRatio: CGFloat = 300.0/255.0
+        static let collectionViewCellWidthAspectRatio: CGFloat = 255.0/375.0
+        static let collectionViewWidthToHeightMultiplier: CGFloat = collectionViewCellWidthAspectRatio * collectionViewCellHeightToWidthAspectRatio
+        static let stackViewBottomOffset: CGFloat = 22.0
+        static let verticalHeight: CGFloat = 768.0
+        static let timerInterSpacing: CGFloat = 30.0
+    }
+}
+
+extension GameViewController: UICollectionViewDelegate, UICollectionViewDelegateFlowLayout, UICollectionViewDataSource{
+    
+    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+        return viewModel.players.count
+    }
+    
+    
+    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: CarouselCell.id, for: indexPath) as! CarouselCell
+        cell.nameLabel.text = viewModel.players[indexPath.item].name
+        cell.scoreLabel.text = "\(viewModel.players[indexPath.item].score)"
+        return cell
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
+        let width = collectionView.frame.width * Constants.collectionViewCellWidthAspectRatio
+        let height = collectionView.frame.width * Constants.collectionViewWidthToHeightMultiplier
+        
+        return CGSize(width: width, height: height)
+    }
+    
 }

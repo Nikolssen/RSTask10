@@ -30,6 +30,8 @@ class CarouselCell: UICollectionViewCell {
     
     override init(frame: CGRect) {
         super.init(frame: frame)
+        backgroundColor = UIColor(named: "AppGrey")
+        layer.cornerRadius = 15.0
         contentView.addSubview(nameLabel)
         contentView.addSubview(scoreLabel)
         nameLabel.translatesAutoresizingMaskIntoConstraints = false
