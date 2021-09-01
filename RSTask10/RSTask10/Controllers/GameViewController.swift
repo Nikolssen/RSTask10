@@ -43,13 +43,13 @@ final class GameViewController: UIViewController {
         collectionView.register(CarouselCell.self, forCellWithReuseIdentifier: CarouselCell.id)
         
         viewModel.onNewTurn = {[unowned self] index in
-            if self.viewModel.currentPlayerIndex == 0 {
+            if index == 0 {
                 leftButton.setImage(UIImage(named: "ToEnd"), for: .normal)
             }
             else {
                 leftButton.setImage(UIImage(named: "Backward"), for: .normal)
             }
-            if self.viewModel.currentPlayerIndex == self.viewModel.players.count - 1{
+            if index == self.viewModel.players.count - 1{
                 rightButton.setImage(UIImage(named: "ToStart"), for: .normal)
             }
             else {
