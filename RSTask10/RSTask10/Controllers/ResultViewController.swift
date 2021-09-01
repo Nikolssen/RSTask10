@@ -92,7 +92,7 @@ final class ResultViewController: UIViewController {
 
 extension ResultViewController: UITableViewDelegate, UITableViewDataSource{
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: "TurnID")!
+        let cell = tableView.dequeueReusableCell(withIdentifier: "TurnID", for: indexPath)
         cell.backgroundColor = UIColor(named: "AppGrey")
     
         cell.textLabel?.text = viewModel.turns[indexPath.row].player
@@ -102,8 +102,6 @@ extension ResultViewController: UITableViewDelegate, UITableViewDataSource{
         let rightLabel = cell.detailTextLabel!
         rightLabel.font = UIFont(name: "Nunito-ExtraBold", size: 20)
         rightLabel.textColor = .white
-        rightLabel.sizeToFit()
-        cell.accessoryView = rightLabel
         let score = viewModel.turns[indexPath.row].scoreChange
         let string = score > 0 ? "+\(score)" : "\(score)"
         rightLabel.text = string
