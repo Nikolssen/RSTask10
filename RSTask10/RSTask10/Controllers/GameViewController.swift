@@ -19,6 +19,7 @@ final class GameViewController: UIViewController {
     let leftButton = UIButton()
     let rightButton = UIButton()
     let diceView = DiceView(frame: .zero)
+    let userIndicator = UserIndicator(frame: .zero)
     
     let buttons: [ShadowedButton] = [.init(), .init(), .init(), .init(), .init()]
     let oneButton: ShadowedButton = ShadowedButton()
@@ -41,7 +42,7 @@ final class GameViewController: UIViewController {
         collectionView.dataSource = self
         collectionView.register(CarouselCell.self, forCellWithReuseIdentifier: CarouselCell.id)
         
-        viewModel.onNewTurn = {[unowned self] in
+        viewModel.onNewTurn = {[unowned self] index in
             if self.viewModel.currentPlayerIndex == 0 {
                 leftButton.setImage(UIImage(named: "ToEnd"), for: .normal)
             }
@@ -54,16 +55,26 @@ final class GameViewController: UIViewController {
             else {
                 rightButton.setImage(UIImage(named: "Forward"), for: .normal)
             }
+            self.userIndicator.activeIndex = index
             self.resetTimer()
             self.startTimer()
            
         }
+        self.userIndicator.characters = viewModel.players.map({ $0.name })
+        userIndicator.activeIndex = viewModel.currentPlayerIndex
+
         
         leftButton.setImage(UIImage(named: "ToEnd"), for: .normal)
         
         if self.viewModel.currentPlayerIndex == self.viewModel.players.count - 1{
             rightButton.setImage(UIImage(named: "ToStart"), for: .normal)
         }
+    }
+    
+    override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+        userIndicator.focus(at: viewModel.currentPlayerIndex)
+        scrollToCurrentIndex()
     }
     
     func configureUI(){
@@ -77,6 +88,8 @@ final class GameViewController: UIViewController {
         view.addSubview(leftButton)
         view.addSubview(rightButton)
         view.addSubview(stackView)
+        
+        view.addSubview(userIndicator)
         view.addSubview(diceView)
         
         view.backgroundColor = UIColor(named: "AppBackground")
@@ -150,7 +163,7 @@ final class GameViewController: UIViewController {
         backButton.translatesAutoresizingMaskIntoConstraints = false
         leftButton.translatesAutoresizingMaskIntoConstraints = false
         rightButton.translatesAutoresizingMaskIntoConstraints = false
-        
+        userIndicator.translatesAutoresizingMaskIntoConstraints = false
         stackView.axis = .horizontal
         stackView.spacing = (view.safeAreaLayoutGuide.layoutFrame.width - (Constants.stackViewButtonWidth * multiplier * 5) - 2 * Constants.horizontalOffset) / 4
         stackView.alignment = .fill
@@ -204,8 +217,12 @@ final class GameViewController: UIViewController {
             timerLabel.bottomAnchor.constraint(equalTo: collectionView.topAnchor, constant: -Constants.timerInterSpacing * multiplier),
             timerLabel.centerXAnchor.constraint(equalTo: view.safeAreaLayoutGuide.centerXAnchor),
             playButton.centerYAnchor.constraint(equalTo: timerLabel.centerYAnchor),
-            playButton.leftAnchor.constraint(equalTo: timerLabel.rightAnchor, constant: Constants.horizontalOffset)
+            playButton.leftAnchor.constraint(equalTo: timerLabel.rightAnchor, constant: Constants.horizontalOffset),
             
+            userIndicator.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: Constants.userIndicatorOffset),
+            userIndicator.centerXAnchor.constraint(equalTo: view.safeAreaLayoutGuide.centerXAnchor),
+            userIndicator.heightAnchor.constraint(equalToConstant: Constants.userIndicatorHeight),
+            userIndicator.lastBaselineAnchor.constraint(equalTo: backButton.lastBaselineAnchor)
             
         ])
         let collectionViewLayout = (collectionView.collectionViewLayout as! UICollectionViewFlowLayout)
@@ -215,10 +232,6 @@ final class GameViewController: UIViewController {
         
     }
     
-    override func viewDidLayoutSubviews() {
-        super.viewDidLayoutSubviews()
-        scrollToCurrentIndex()
-    }
     
     @objc func addButtonTapped(sender: UIButton){
         if sender === oneButton {
@@ -318,6 +331,7 @@ final class GameViewController: UIViewController {
 
         stopTime = Date.timeIntervalSinceReferenceDate
         isTimerActive = false
+        timer?.invalidate()
     }
     
     func resetTimer(){
@@ -363,6 +377,8 @@ extension GameViewController{
         static let stackViewBottomOffset: CGFloat = 22.0
         static let verticalHeight: CGFloat = 768.0
         static let timerInterSpacing: CGFloat = 30.0
+        static let userIndicatorOffset: CGFloat = 70.0
+        static let userIndicatorHeight: CGFloat = 30.0
     }
 }
 

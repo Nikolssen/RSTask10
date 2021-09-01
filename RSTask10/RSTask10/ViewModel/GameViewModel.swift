@@ -16,14 +16,14 @@ class GameViewModel {
     var currentPlayerIndex: Int {
         willSet{
             turns.append(Turn(player: players[newValue].name, scoreChange: 0))
-            onNewTurn?()
+            onNewTurn?(newValue)
         }
     }
     var players: [Player]
     var turns: [Turn] = .init()
     let coordinator: GameViewModelCoordinator
     
-    var onNewTurn: (()-> Void)?
+    var onNewTurn: ((Int)-> Void)?
     
     init(players: [Player], coordinator: GameViewModelCoordinator) {
         self.players = players
