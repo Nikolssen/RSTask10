@@ -59,6 +59,11 @@ extension Coordinator: DashboardViewModelCoordinator{
         let gameViewController = self.gameViewController
         gameViewController.viewModel = GameViewModel(players: players, coordinator: self)
         rootViewController.setViewControllers([gameViewController], animated: true)
+        if let modalNavigationController = modalNavigationController {
+            modalNavigationController.dismiss(animated: true, completion: nil)
+            self.modalNavigationController = nil
+        }
+        
     }
     
     func addPlayer(handler: @escaping ((String) -> Bool)) {
