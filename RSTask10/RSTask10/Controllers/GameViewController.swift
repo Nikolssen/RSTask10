@@ -58,6 +58,12 @@ final class GameViewController: UIViewController {
             self.startTimer()
            
         }
+        
+        leftButton.setImage(UIImage(named: "ToEnd"), for: .normal)
+        
+        if self.viewModel.currentPlayerIndex == self.viewModel.players.count - 1{
+            rightButton.setImage(UIImage(named: "ToStart"), for: .normal)
+        }
     }
     
     func configureUI(){
@@ -195,7 +201,7 @@ final class GameViewController: UIViewController {
             collectionView.heightAnchor.constraint(equalTo: view.safeAreaLayoutGuide.widthAnchor, multiplier: Constants.collectionViewWidthToHeightMultiplier),
             collectionView.bottomAnchor.constraint(equalTo: oneButton.topAnchor, constant: -Constants.collectionViewBottomOffset * multiplier),
             
-            timerLabel.topAnchor.constraint(equalTo: headerLabel.bottomAnchor, constant: Constants.timerInterSpacing * multiplier),
+            timerLabel.bottomAnchor.constraint(equalTo: collectionView.topAnchor, constant: -Constants.timerInterSpacing * multiplier),
             timerLabel.centerXAnchor.constraint(equalTo: view.safeAreaLayoutGuide.centerXAnchor),
             playButton.centerYAnchor.constraint(equalTo: timerLabel.centerYAnchor),
             playButton.leftAnchor.constraint(equalTo: timerLabel.rightAnchor, constant: Constants.horizontalOffset)
@@ -390,7 +396,13 @@ extension GameViewController: UICollectionViewDelegate, UICollectionViewDelegate
     
     func scrollViewWillEndDragging(_ scrollView: UIScrollView, withVelocity velocity: CGPoint, targetContentOffset: UnsafeMutablePointer<CGPoint>) {
         let pageWidth = collectionView(collectionView, layout: collectionView.collectionViewLayout, sizeForItemAt: IndexPath(item: 0, section: 0)).width + 20
-        viewModel.currentPlayerIndex = (velocity.x == 0) ? Int(floor((targetContentOffset.pointee.x - pageWidth / 2) / pageWidth) + 1.0 ) : (velocity.x > 0 ? viewModel.currentPlayerIndex + 1: viewModel.currentPlayerIndex - 1)
+        
+        let newIndex = (velocity.x == 0) ? Int(floor((targetContentOffset.pointee.x - pageWidth / 2) / pageWidth) + 1.0 ) : (velocity.x > 0 ? viewModel.currentPlayerIndex + 1: viewModel.currentPlayerIndex - 1)
+        
+        if newIndex >= 0 && newIndex < viewModel.players.count {
+            viewModel.currentPlayerIndex = newIndex
+        }
+        
         targetContentOffset.pointee = CGPoint(x: pageWidth * CGFloat(viewModel.currentPlayerIndex), y: targetContentOffset.pointee.y)
     }
     
