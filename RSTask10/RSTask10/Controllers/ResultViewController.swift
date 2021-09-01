@@ -28,7 +28,8 @@ final class ResultViewController: UIViewController {
         configureLayout()
         tableView.dataSource = self
         tableView.delegate = self
-        tableView.register(UITableViewCell.self, forCellReuseIdentifier: "TurnID")
+        tableView.register(ResultCell.self, forCellReuseIdentifier: "TurnID")
+        
     }
     
     func confugureUI() {
@@ -97,7 +98,8 @@ extension ResultViewController: UITableViewDelegate, UITableViewDataSource{
         cell.textLabel?.text = viewModel.turns[indexPath.row].player
         cell.textLabel?.font = UIFont(name: "Nunito-ExtraBold", size: 20)
         cell.textLabel?.textColor = .white
-        let rightLabel = UILabel()
+        //cell.detailTextLabel.
+        let rightLabel = cell.detailTextLabel!
         rightLabel.font = UIFont(name: "Nunito-ExtraBold", size: 20)
         rightLabel.textColor = .white
         rightLabel.sizeToFit()
