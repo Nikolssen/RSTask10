@@ -21,10 +21,18 @@ class Coordinator {
     var state: Coordinator.State = .initial
 
     
-    let statusService = StatusService()
+    let statusService = StatusService(key: "Party")
     
     func start(){
-        rootViewController.setViewControllers([dashboardViewController], animated: true)
+        if let entity = statusService.loadEntity() {
+            let gameViewController = self.gameViewController
+            let gameViewModel = GameViewModel(entity: entity, coordinator: self, statusService: self.statusService)
+            gameViewController.viewModel = gameViewModel
+            rootViewController.setViewControllers([gameViewController], animated: true)
+        } else {
+            rootViewController.setViewControllers([dashboardViewController], animated: true)
+        }
+        
     }
     
     var dashboardViewController: DashboardViewController{
@@ -57,7 +65,7 @@ class Coordinator {
 extension Coordinator: DashboardViewModelCoordinator{
     func startGame(with players: [Player]) {
         let gameViewController = self.gameViewController
-        gameViewController.viewModel = GameViewModel(players: players, coordinator: self)
+        gameViewController.viewModel = GameViewModel(players: players, coordinator: self, statusService: self.statusService)
         rootViewController.setViewControllers([gameViewController], animated: true)
         if let modalNavigationController = modalNavigationController {
             modalNavigationController.dismiss(animated: true, completion: nil)

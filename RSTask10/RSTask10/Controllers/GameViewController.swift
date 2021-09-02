@@ -30,8 +30,7 @@ final class GameViewController: UIViewController {
     var timer: Timer?
     var startTime: TimeInterval?
     var stopTime: TimeInterval?
-    var isTimerActive: Bool = true
-    
+       
     override func viewDidLoad() {
         super.viewDidLoad()
         configureUI()
@@ -58,7 +57,15 @@ final class GameViewController: UIViewController {
             self.userIndicator.activeIndex = index
             self.resetTimer()
             self.startTimer()
-           
+            
+            if let time = viewModel.getTimerRestoreInfo(){
+                stopTime = time.stopTime
+                startTime = time.startTime
+                updateTimerLabel()
+            }
+            else {
+                timerLabel.text = "00:00"
+            }
         }
         self.userIndicator.characters = viewModel.players.map({ $0.name })
         userIndicator.activeIndex = viewModel.currentPlayerIndex
@@ -69,6 +76,8 @@ final class GameViewController: UIViewController {
         if self.viewModel.currentPlayerIndex == self.viewModel.players.count - 1{
             rightButton.setImage(UIImage(named: "ToStart"), for: .normal)
         }
+        
+        NotificationCenter.default.addObserver(self, selector: #selector(save), name: UIApplication.willResignActiveNotification, object: nil)
     }
     
     override func viewDidLayoutSubviews() {
@@ -139,10 +148,10 @@ final class GameViewController: UIViewController {
         
         timerLabel.font = UIFont(name: "Nunito-ExtraBold", size: 28)
         timerLabel.textColor = UIColor.white
-        timerLabel.text = "00:00"
-        startTimer()
+        
         playButton.setImage(UIImage(named: "Pause"), for: .normal)
         playButton.addTarget(self, action: #selector(stopAndPlay), for: .touchUpInside)
+        
         
     }
     
@@ -275,7 +284,7 @@ final class GameViewController: UIViewController {
     }
     
     @objc func stopAndPlay(){
-        if isTimerActive {
+        if let timer = timer, timer.isValid {
             timerLabel.textColor = UIColor(named: "AppGrey")
             playButton.setImage(UIImage(named: "Play"), for: .normal)
             stopTimer()
@@ -323,14 +332,14 @@ final class GameViewController: UIViewController {
         }
         else {
             self.startTime = Date.timeIntervalSinceReferenceDate
+            
         }
-        isTimerActive = true
+        self.stopTime = nil
     }
     
     func stopTimer(){
 
         stopTime = Date.timeIntervalSinceReferenceDate
-        isTimerActive = false
         timer?.invalidate()
     }
     
@@ -338,7 +347,6 @@ final class GameViewController: UIViewController {
         startTime = nil
         stopTime = nil
         timer?.invalidate()
-        isTimerActive = false
     }
     
     @objc func updateTimerLabel(){
@@ -350,6 +358,18 @@ final class GameViewController: UIViewController {
         
         let string = String(format: "%02d:%02d", minutes, seconds)
         timerLabel.text = string
+    }
+    
+    @objc func save(){
+        if let isValid = timer?.isValid, isValid, let timestamp = startTime {
+            viewModel.saveParty(timestamp: timestamp, stoppedTime: nil)
+            return
+        }
+        
+        if let stopTime = stopTime{
+            viewModel.saveParty(timestamp: nil, stoppedTime: stopTime)
+        }
+        
     }
     
     deinit {

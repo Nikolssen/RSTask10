@@ -23,13 +23,31 @@ class GameViewModel {
     var turns: [Turn] = .init()
     let coordinator: GameViewModelCoordinator
     
+    let startTime: TimeInterval?
+    let stopTime: TimeInterval?
+    
+    let statusService: StatusService
     var onNewTurn: ((Int)-> Void)?
     
-    init(players: [Player], coordinator: GameViewModelCoordinator) {
+    init(players: [Player], coordinator: GameViewModelCoordinator, statusService: StatusService) {
         self.players = players
         self.coordinator = coordinator
-        currentPlayerIndex = 0
+        self.currentPlayerIndex = 0
         turns.append(Turn(player: players[0].name, scoreChange: 0))
+        
+        self.startTime = nil
+        self.stopTime = nil
+        self.statusService = statusService
+    }
+    
+    init(entity: Entity, coordinator: GameViewModelCoordinator, statusService: StatusService) {
+        self.players = entity.players
+        self.coordinator = coordinator
+        self.turns = entity.turns
+        self.startTime = entity.timestamp
+        self.stopTime = entity.stoppedTime
+        self.currentPlayerIndex = entity.currentIndex
+        self.statusService = statusService
     }
     
     func add(score: Int){
@@ -57,5 +75,19 @@ class GameViewModel {
     func newGame(){
         coordinator.newGame()
     }
+    
+    func getTimerRestoreInfo() -> (startTime: TimeInterval?, stopTime: TimeInterval?)?{
+        guard  startTime != nil || stopTime != nil else { return nil }
+        return (startTime, stopTime)
+    }
+    
+    func saveParty(timestamp: TimeInterval?, stoppedTime: TimeInterval?){
+        statusService.store(entity: Entity(players: players, turns: turns, timestamp: timestamp, stoppedTime: stoppedTime, currentIndex: currentPlayerIndex))
+    }
+    
+    func clearParty(){
+        statusService.clearEntity()
+    }
+    
     
 }

@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct Player {
+struct Player: Codable {
     
     var score: Int = 0
     let name: String

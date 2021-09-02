@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct Turn {
+struct Turn: Codable {
     let player: String
     var scoreChange: Int
 }
