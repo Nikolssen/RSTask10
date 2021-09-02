@@ -58,18 +58,25 @@ final class GameViewController: UIViewController {
             self.resetTimer()
             self.startTimer()
             
-            if let time = viewModel.getTimerRestoreInfo(){
-                stopTime = time.stopTime
-                startTime = time.startTime
-                updateTimerLabel()
-            }
-            else {
-                timerLabel.text = "00:00"
-            }
         }
         self.userIndicator.characters = viewModel.players.map({ $0.name })
         userIndicator.activeIndex = viewModel.currentPlayerIndex
 
+        if let time = viewModel.getTimerRestoreInfo(){
+            if let stopTime = time.stopTime {
+                self.stopTime = stopTime
+            }
+            else {
+                startTime = time.startTime
+                self.startTimer()
+            }
+
+            updateTimerLabel()
+        }
+        else {
+            timerLabel.text = "00:00"
+            self.startTimer()
+        }
         
         leftButton.setImage(UIImage(named: "ToEnd"), for: .normal)
         
@@ -327,8 +334,13 @@ final class GameViewController: UIViewController {
 
         self.timer = timer
         
-        if self.startTime != nil, let stopTime = self.stopTime {
-            self.startTime! += (Date.timeIntervalSinceReferenceDate - stopTime)
+        if self.startTime != nil{
+            if let stopTime = self.stopTime {
+                self.startTime! += (Date.timeIntervalSinceReferenceDate - stopTime)
+            }
+            else {
+                return
+            }
         }
         else {
             self.startTime = Date.timeIntervalSinceReferenceDate

@@ -19,7 +19,7 @@ class ResultsViewModel {
     init(coordinator: ResultsViewModelCoordinator, players: [Player], turns: [Turn]){
         self.coordinator = coordinator
         self.players = players
-        self.turns = turns
+        self.turns = turns.reversed()
     }
     
     func newGame(){
