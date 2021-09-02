@@ -13,9 +13,7 @@ final class ResultViewController: UIViewController {
     
     let scrollView = UIScrollView()
     let headerLabel = UILabel()
-    
-    
-    let leaderStack = UIStackView()
+
     
     let tableView = UITableView(frame: .zero, style: .plain)
     
@@ -30,13 +28,41 @@ final class ResultViewController: UIViewController {
         tableView.delegate = self
         tableView.register(ResultCell.self, forCellReuseIdentifier: "TurnID")
         
+
+        let stackView = UIStackView(arrangedSubviews: viewModel.scoreRanking().map{ (player, place) in
+            let view = PlayerScoreView(frame: .zero)
+            view.setupFromPlayer(player: player, place: place)
+
+            return view
+        })
+        
+        stackView.axis = .vertical
+        stackView.alignment = .fill
+        stackView.distribution = .fillEqually
+        stackView.spacing = 5
+        
+        scrollView.addSubview(stackView)
+        stackView.translatesAutoresizingMaskIntoConstraints = false
+        
+        NSLayoutConstraint.activate([
+            stackView.topAnchor.constraint(equalTo: scrollView.topAnchor),
+            stackView.bottomAnchor.constraint(equalTo: scrollView.bottomAnchor),
+            stackView.leadingAnchor.constraint(equalTo: scrollView.leadingAnchor),
+            stackView.trailingAnchor.constraint(equalTo: scrollView.trailingAnchor)
+        ])
+        
+        stackView.arrangedSubviews.forEach{
+            $0.translatesAutoresizingMaskIntoConstraints = false
+            $0.heightAnchor.constraint(equalToConstant: 55).isActive = true
+            $0.widthAnchor.constraint(equalToConstant: view.safeAreaLayoutGuide.layoutFrame.width - Constants.horizontalOffset * 2).isActive = true
+        }
+        
     }
     
     func confugureUI() {
         view.addSubview(headerLabel)
         view.addSubview(tableView)
         view.addSubview(scrollView)
-        
 
         view.backgroundColor = UIColor(named: "AppBackground")
         navigationItem.backBarButtonItem = nil
@@ -47,7 +73,7 @@ final class ResultViewController: UIViewController {
         headerLabel.text = "Results"
         headerLabel.font = UIFont(name: "Nunito-ExtraBold", size: 36.0)
         headerLabel.textColor =  UIColor.white
-        scrollView.backgroundColor = .gray
+        
         tableView.layer.cornerRadius = 15
         tableView.separatorStyle = .singleLine
         tableView.separatorColor = UIColor(red: 0.333, green: 0.333, blue: 0.333, alpha: 1)

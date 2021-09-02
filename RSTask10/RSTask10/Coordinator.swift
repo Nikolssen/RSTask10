@@ -109,7 +109,10 @@ extension Coordinator: GameViewModelCoordinator{
 
 extension Coordinator: ResultsViewModelCoordinator{
     func newGameFromResults() {
-        
+        let dashboardViewController = self.dashboardViewController
+        let modalNavigationController = UINavigationController(rootViewController: dashboardViewController)
+        self.modalNavigationController = modalNavigationController
+        rootViewController.present(modalNavigationController, animated: true, completion: nil)
     }
     
     func resume() {

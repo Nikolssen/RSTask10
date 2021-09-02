@@ -54,9 +54,8 @@ class PlayerScoreView: UIView {
             nameLabel.centerYAnchor.constraint(equalTo: centerYAnchor),
             nameLabel.leftAnchor.constraint(equalTo: placeLabel.rightAnchor),
             scoreLabel.centerYAnchor.constraint(equalTo: centerYAnchor),
-            scoreLabel.rightAnchor.constraint(equalTo: rightAnchor)
+            scoreLabel.rightAnchor.constraint(equalTo: rightAnchor, constant: -10.0)
         ])
     }
-
 }
 
